@@ -1,1 +1,1 @@
-include ':CovrMe'
+include ':CovrMe', ':CovrMe:libs:httpmime-4.2.5'
