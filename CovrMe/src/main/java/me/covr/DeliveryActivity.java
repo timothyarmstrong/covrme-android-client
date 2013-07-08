@@ -30,6 +30,9 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by andy on 2013-07-07.
  */
+
+// TODO(ampersandy): Rewrite anonymous classes as lambdas
+
 public class DeliveryActivity extends Activity {
   public static String TAG = "covr.me";
   final private ByteArrayBody[] bab = {null};
@@ -40,17 +43,13 @@ public class DeliveryActivity extends Activity {
 
     final Camera c = Camera.open(0);
 
+    // lambda
     Camera.PictureCallback jpegcb = new Camera.PictureCallback() {
       public void onPictureTaken(byte[] data, Camera camera) {
         bab[0] = new ByteArrayBody(data, "upload.jpg");
         c.release();
       }
     };
-
-//    Camera.PictureCallback jpegCallback = (byte[] data, Camera camera) -> {
-//      bab[0] = new ByteArrayBody(data, "upload.jpg");
-//      c.release();
-//    };
 
     try {
       SurfaceView dummy = new SurfaceView(this);
@@ -127,7 +126,6 @@ public class DeliveryActivity extends Activity {
 
       post.setEntity(ent);
 
-      Log.d(TAG, Integer.toString(a.id));
       try {
         HttpResponse resp = client.execute(post);
         BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent(), "UTF-8"));
@@ -158,19 +156,15 @@ public class DeliveryActivity extends Activity {
     protected String doInBackground(Args... reqs) {
       Args a = reqs[0];
       HttpClient client = new DefaultHttpClient();
-      Log.d(TAG, Integer.toString(a.id));
       HttpGet get = new HttpGet("http://covrme-dev-armstrong-timothy.appspot.com/doorbells/65432353/visitors/" + Integer.toString(a.id) + "/messages");
 
       String content = "No answer received.";
       HttpResponse resp = null;
       int count = 60;
       while (count > 0) {
-        Log.d(TAG, Integer.toString(a.id));
-        Log.d(TAG, Integer.toString(count));
         try {
           resp = client.execute(get);
           String body = parseResponse(resp);
-          Log.d(TAG, body);
           JSONArray ar = new JSONArray(body);
           if (ar.length() == 0) {
             count--;
@@ -233,6 +227,7 @@ public class DeliveryActivity extends Activity {
         String upload = json.getString("PhotoUploadUrl");
         final Args arg = new Args(upload, id, "");
         Handler handler = new Handler();
+        //lambda
         handler.postDelayed(new Runnable() {
           public void run() {
             new UploadTask().execute(arg);
