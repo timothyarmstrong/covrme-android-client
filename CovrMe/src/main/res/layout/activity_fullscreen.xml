@@ -32,6 +32,7 @@
                 android:onClick="business"
                 android:layout_gravity="center"
                 android:drawableTop="@drawable/shake"
+                android:background="@drawable/button_shape"
                 android:layout_weight="1"/>
 
         <Button
@@ -41,7 +42,7 @@
                 android:id="@+id/button2"
                 android:onClick="personal"
                 android:layout_gravity="center_vertical"
-                android:drawableTop="@drawable/friends"
+                android:drawableTop="@drawable/default_profile"
                 android:layout_weight="1"/>
     </LinearLayout>
 

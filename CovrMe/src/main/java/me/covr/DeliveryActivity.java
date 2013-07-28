@@ -29,7 +29,7 @@ public class DeliveryActivity extends ApproachActivity {
     MultipartEntity ent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 
     try {
-      ent.addPart("description", new StringBody("Delivery!"));
+      ent.addPart("description", new StringBody("delivery"));
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }

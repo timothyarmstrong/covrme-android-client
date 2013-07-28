@@ -38,7 +38,6 @@ abstract public class ApproachActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-
     final Camera c = Camera.open(0);
 
     Camera.PictureCallback jpegcb = (data, camera) -> { bab[0] = new ByteArrayBody(data, "upload.jpg"); };
@@ -55,37 +54,6 @@ abstract public class ApproachActivity extends Activity {
     }
 
     new RequestTask().execute(getFirstPost());
-  }
-
-  private static String parseResponse(HttpResponse resp) {
-    String r = "";
-    try {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent(), "UTF-8"));
-      String response;
-      StringBuilder s = new StringBuilder();
-      while ((response = reader.readLine()) != null) {
-        s = s.append(response);
-      }
-      r = s.toString();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return r;
-  }
-
-
-  private class Args {
-    public String url;
-    public String arbitrary;
-    public int id;
-    public int doorid;
-
-    public Args(String url, int id, String arb) {
-      this.url = url;
-      this.id = id;
-      this.doorid = 65432353;
-      this.arbitrary = arb;
-    }
   }
 
   private class RequestTask extends AsyncTask<HttpPost, Void, String> {
@@ -118,24 +86,18 @@ abstract public class ApproachActivity extends Activity {
         JSONObject json = new JSONObject(body);
         int id = json.getInt("Id");
         String upload = json.getString("PhotoUploadUrl");
-        final Args arg = new Args(upload, id, "");
-        Handler handler = new Handler();
-        //lambda
-        handler.postDelayed(new Runnable() {
-          public void run() {
-            new UploadTask().execute(arg);
-          }
-        }, 1500);
+        final Util.Args arg = new Util.Args(upload, id, "");
+        (new Handler()).postDelayed(() -> { new UploadTask().execute(arg); }, 1500);
       } catch (JSONException e) {
         e.printStackTrace();
       }
     }
   }
 
-  private class PollTask extends AsyncTask<Args, Void, String> {
+  private class PollTask extends AsyncTask<Util.Args, Void, String> {
     @Override
-    protected String doInBackground(Args... reqs) {
-      Args a = reqs[0];
+    protected String doInBackground(Util.Args... reqs) {
+      Util.Args a = reqs[0];
       HttpClient client = new DefaultHttpClient();
       HttpGet get = new HttpGet("http://covrme-dev-armstrong-timothy.appspot.com/doorbells/65432353/visitors/" + Integer.toString(a.id) + "/messages");
 
@@ -145,7 +107,7 @@ abstract public class ApproachActivity extends Activity {
       while (count > 0) {
         try {
           resp = client.execute(get);
-          String body = parseResponse(resp);
+          String body = Util.parseResponse(resp);
           JSONArray ar = new JSONArray(body);
           if (ar.length() == 0) {
             count--;
@@ -175,11 +137,11 @@ abstract public class ApproachActivity extends Activity {
     }
   }
 
-  private class UploadTask extends AsyncTask<Args, Void, Args> {
+  private class UploadTask extends AsyncTask<Util.Args, Void, Util.Args> {
     @Override
-    protected Args doInBackground(Args... args) {
+    protected Util.Args doInBackground(Util.Args... args) {
       String r = "";
-      Args a = args[0];
+      Util.Args a = args[0];
       HttpClient client = new DefaultHttpClient();
       HttpPost post = new HttpPost(a.url);
 
@@ -212,7 +174,7 @@ abstract public class ApproachActivity extends Activity {
     }
 
     @Override
-    protected void onPostExecute(Args a) {
+    protected void onPostExecute(Util.Args a) {
       TextView t = (TextView) findViewById(R.id.textView);
       t.setText("Waiting for response...");
       new PollTask().execute(a);
