@@ -19,4 +19,14 @@ public class FullscreenActivity extends Activity {
     Intent intent = new Intent(this, DeliveryActivity.class);
     startActivity(intent);
   }
+
+  public void business(View view) {
+    Intent intent = new Intent(this, DeliveryActivity.class);
+    startActivity(intent);
+  }
+
+  public void personal(View view) {
+    Intent intent = new Intent(this, DeliveryActivity.class);
+    startActivity(intent);
+  }
 }

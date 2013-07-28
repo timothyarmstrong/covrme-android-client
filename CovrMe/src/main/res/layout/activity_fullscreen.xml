@@ -20,6 +20,7 @@
                 android:text="Delivery"
                 android:id="@+id/button"
                 android:layout_gravity="center"
+                android:drawableTop="@drawable/delivery"
                 android:onClick="deliver"
                 android:layout_weight="1"/>
 
@@ -28,7 +29,9 @@
                 android:layout_height="wrap_content"
                 android:text="Business"
                 android:id="@+id/button3"
+                android:onClick="business"
                 android:layout_gravity="center"
+                android:drawableTop="@drawable/shake"
                 android:layout_weight="1"/>
 
         <Button
@@ -36,7 +39,9 @@
                 android:layout_height="wrap_content"
                 android:text="Personal"
                 android:id="@+id/button2"
+                android:onClick="personal"
                 android:layout_gravity="center_vertical"
+                android:drawableTop="@drawable/friends"
                 android:layout_weight="1"/>
     </LinearLayout>
 

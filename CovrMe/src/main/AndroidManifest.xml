@@ -37,6 +37,9 @@
             android:theme="@style/FullscreenTheme" >
         </activity>
         <activity android:name=".DeliveryActivity"/>
+        <activity android:name=".ApproachActivity"/>
+        <activity android:name=".BusinessActivity"/>
+        <activity android:name=".PersonalActivity"/>
 
     </application>
 
