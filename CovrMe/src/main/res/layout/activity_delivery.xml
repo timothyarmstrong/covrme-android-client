@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/app_background"
-    tools:context=".DeliveryActivity">
+    tools:context=".DeliveryActivity"
+    android:clickable="true">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
@@ -11,19 +12,15 @@
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
-    <FrameLayout
-            android:id="@+id/camera_preview"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            >
-
-        <TextView
-                android:layout_width="234dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Messaging Owner"
-                android:id="@+id/textView"
-                android:layout_gravity="center"/>
-    </FrameLayout>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Messaging Owner"
+            android:id="@+id/textView"
+            android:layout_gravity="center"
+            android:background="@drawable/button_shape"
+            android:padding="20px"
+            android:textColor="#FFFFFF"/>
 
 </FrameLayout>

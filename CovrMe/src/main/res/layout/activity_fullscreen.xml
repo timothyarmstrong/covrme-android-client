@@ -8,39 +8,49 @@
     <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:gravity="fill_horizontal|center_horizontal">
+            android:gravity="fill_horizontal|center_horizontal"
+            >
 
         <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="250px"
                 android:text="Delivery"
+                android:textColor="#FFFFFF"
                 android:id="@+id/button"
                 android:layout_gravity="center"
-                android:drawableTop="@drawable/delivery"
+                android:drawableTop="@drawable/deliv"
                 android:onClick="deliver"
                 android:background="@drawable/button_shape"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_margin="10px"
+                android:paddingTop="20px"/>
 
         <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Business"
+                android:layout_height="250px"
                 android:id="@+id/button3"
                 android:onClick="business"
                 android:layout_gravity="center"
-                android:drawableTop="@drawable/shake"
+                android:drawableTop="@drawable/work"
                 android:background="@drawable/button_shape"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="Business"
+                android:textColor="#FFFFFF"
+                android:layout_margin="10px"
+                android:paddingTop="20px"/>
 
         <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="250px"
                 android:text="Personal"
+                android:textColor="#FFFFFF"
                 android:id="@+id/button2"
                 android:onClick="personal"
                 android:layout_gravity="center_vertical"
-                android:drawableTop="@drawable/default_profile"
+                android:drawableTop="@drawable/pers"
                 android:background="@drawable/button_shape"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_margin="10px"
+                android:paddingTop="20px"/>
     </LinearLayout>
 </FrameLayout>
