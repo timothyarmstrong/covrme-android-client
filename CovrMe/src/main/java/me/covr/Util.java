@@ -12,13 +12,14 @@ public class Util {
   public static class Args {
     public String url;
     public String arbitrary;
-    public int id;
-    public int doorid;
+    public String visitorId;
+    public String doorid;
 
-    public Args(String url, int id, String arb) {
+    public Args(String url, String id, String arb) {
       this.url = url;
-      this.id = id;
-      this.doorid = 65432353;
+      this.visitorId = id;
+      //this.doorid = 65432353;
+      this.doorid = "04450031";
       this.arbitrary = arb;
     }
   }

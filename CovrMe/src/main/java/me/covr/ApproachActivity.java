@@ -32,15 +32,26 @@ import java.io.UnsupportedEncodingException;
 abstract public class ApproachActivity extends Activity {
   public static String TAG = "covr.me";
   final private ByteArrayBody[] bab = {null};
-
-  abstract HttpPost getFirstPost();
+  abstract protected String getDesc();
 
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_delivery);
 
-    final Camera c = Camera.open(0);
+    final Camera c = Camera.open();
 
-    Camera.PictureCallback jpegcb = (data, camera) -> { bab[0] = new ByteArrayBody(data, "upload.jpg"); };
+    // TODO: Camera is _bananas_ I have no idea how to tame this beast
+    Camera.PictureCallback jpegcb = new Camera.PictureCallback() {
+      @Override
+      public void onPictureTaken(byte[] bytes, Camera camera) {
+        bab[0] = new ByteArrayBody(bytes, "upload.jpg");
+        try {
+          c.release();
+        } catch (Exception e) {
+          //pass
+        }
+      }
+    };
 
     try {
       SurfaceView dummy = new SurfaceView(this);
@@ -49,11 +60,28 @@ abstract public class ApproachActivity extends Activity {
       c.takePicture(null, null, jpegcb);
     } catch (IOException e) {
       e.printStackTrace();
-    } finally {
-      c.release(); // todo: test if re-releasing causes issues
+    } catch (Exception e) {
+      //pass
+    }
+    //finally {
+    //  if (c != null) {
+    //    c.release(); // todo: test if re-releasing causes issues
+    //  }
+    //}
+
+    //String doorId = "65432353";
+    String doorId = "04450031";
+    HttpPost post = new HttpPost("http://covrme-dev-armstrong-timothy.appspot.com/doorbells/" + doorId + "/visitors");
+    MultipartEntity ent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+
+    try {
+      ent.addPart("description", new StringBody(this.getDesc()));
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
     }
 
-    new RequestTask().execute(getFirstPost());
+    post.setEntity(ent);
+    new RequestTask().execute(post);
   }
 
   private class RequestTask extends AsyncTask<HttpPost, Void, String> {
@@ -84,13 +112,66 @@ abstract public class ApproachActivity extends Activity {
     protected void onPostExecute(String body) {
       try {
         JSONObject json = new JSONObject(body);
-        int id = json.getInt("Id");
-        String upload = json.getString("PhotoUploadUrl");
-        final Util.Args arg = new Util.Args(upload, id, "");
-        (new Handler()).postDelayed(() -> { new UploadTask().execute(arg); }, 1500);
+        int id = json.getInt("id");
+        String visitorId = Integer.toString(id);
+        String upload = json.getString("photo_upload_url");
+        final Util.Args arg = new Util.Args(upload, visitorId, "");
+        (new Handler()).postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            new UploadTask().execute(arg);
+          }
+        }, 1500);
       } catch (JSONException e) {
         e.printStackTrace();
       }
+    }
+  }
+
+  private class UploadTask extends AsyncTask<Util.Args, Void, Util.Args> {
+    @Override
+    protected Util.Args doInBackground(Util.Args... args) {
+      String r = "";
+      Util.Args a = args[0];
+      if (bab[0] == null) {
+        return a;
+      }
+      HttpClient client = new DefaultHttpClient();
+      HttpPost post = new HttpPost(a.url);
+
+
+      MultipartEntity ent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+      try {
+        ent.addPart("doorbellId", new StringBody(a.doorid));
+        ent.addPart("visitorId", new StringBody(a.visitorId));
+        ent.addPart("file", bab[0]);
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+
+      post.setEntity(ent);
+
+      try {
+        HttpResponse resp = client.execute(post);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent(), "UTF-8"));
+        String response;
+        StringBuilder s = new StringBuilder();
+        while ((response = reader.readLine()) != null) {
+          s = s.append(response);
+        }
+        r = s.toString();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      a.arbitrary = r;
+      return a;
+    }
+
+    @Override
+    protected void onPostExecute(Util.Args a) {
+      TextView t = (TextView) findViewById(R.id.textView);
+      t.setText("Waiting for response...");
+      new PollTask().execute(a);
     }
   }
 
@@ -99,7 +180,8 @@ abstract public class ApproachActivity extends Activity {
     protected String doInBackground(Util.Args... reqs) {
       Util.Args a = reqs[0];
       HttpClient client = new DefaultHttpClient();
-      HttpGet get = new HttpGet("http://covrme-dev-armstrong-timothy.appspot.com/doorbells/65432353/visitors/" + Integer.toString(a.id) + "/messages");
+      String doorid = "04450031";
+      HttpGet get = new HttpGet("http://covrme-dev-armstrong-timothy.appspot.com/doorbells/" + doorid + "/visitors/" + a.visitorId + "/messages");
 
       String content = "No answer received.";
       HttpResponse resp = null;
@@ -134,50 +216,6 @@ abstract public class ApproachActivity extends Activity {
     protected void onPostExecute(String body) {
       TextView t = (TextView) findViewById(R.id.textView);
       t.setText(body);
-    }
-  }
-
-  private class UploadTask extends AsyncTask<Util.Args, Void, Util.Args> {
-    @Override
-    protected Util.Args doInBackground(Util.Args... args) {
-      String r = "";
-      Util.Args a = args[0];
-      HttpClient client = new DefaultHttpClient();
-      HttpPost post = new HttpPost(a.url);
-
-
-      MultipartEntity ent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-      try {
-        ent.addPart("doorbellId", new StringBody(Integer.toString(a.doorid)));
-        ent.addPart("visitorId", new StringBody(Integer.toString(a.id)));
-        ent.addPart("file", bab[0]);
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
-
-      post.setEntity(ent);
-
-      try {
-        HttpResponse resp = client.execute(post);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent(), "UTF-8"));
-        String response;
-        StringBuilder s = new StringBuilder();
-        while ((response = reader.readLine()) != null) {
-          s = s.append(response);
-        }
-        r = s.toString();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      a.arbitrary = r;
-      return a;
-    }
-
-    @Override
-    protected void onPostExecute(Util.Args a) {
-      TextView t = (TextView) findViewById(R.id.textView);
-      t.setText("Waiting for response...");
-      new PollTask().execute(a);
     }
   }
 }
