@@ -2,12 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="@drawable/app_background"
     tools:context=".FullscreenActivity">
-
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
 
     <LinearLayout
             android:layout_width="fill_parent"
@@ -22,6 +18,7 @@
                 android:layout_gravity="center"
                 android:drawableTop="@drawable/delivery"
                 android:onClick="deliver"
+                android:background="@drawable/button_shape"
                 android:layout_weight="1"/>
 
         <Button
@@ -43,10 +40,7 @@
                 android:onClick="personal"
                 android:layout_gravity="center_vertical"
                 android:drawableTop="@drawable/default_profile"
+                android:background="@drawable/button_shape"
                 android:layout_weight="1"/>
     </LinearLayout>
-
-    <!-- This FrameLayout insets its children based on system windows using
-         android:fitsSystemWindows. -->
-
 </FrameLayout>
