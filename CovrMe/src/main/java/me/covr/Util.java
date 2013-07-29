@@ -15,12 +15,11 @@ public class Util {
     public String visitorId;
     public String doorid;
 
-    public Args(String url, String id, String arb) {
+    public Args(String url, String id) {
       this.url = url;
       this.visitorId = id;
-      //this.doorid = 65432353;
-      this.doorid = "04450031";
-      this.arbitrary = arb;
+      this.doorid = "65432353";
+      //this.doorid = "04450031";
     }
   }
 

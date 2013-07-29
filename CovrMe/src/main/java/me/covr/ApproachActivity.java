@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.TextView;
 
@@ -38,39 +39,31 @@ abstract public class ApproachActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_delivery);
 
-    final Camera c = Camera.open();
+    final Camera c = Camera.open(0);
 
-    // TODO: Camera is _bananas_ I have no idea how to tame this beast
     Camera.PictureCallback jpegcb = new Camera.PictureCallback() {
       @Override
       public void onPictureTaken(byte[] bytes, Camera camera) {
         bab[0] = new ByteArrayBody(bytes, "upload.jpg");
-        try {
+        if (c != null) {
           c.release();
-        } catch (Exception e) {
-          //pass
         }
       }
     };
 
     try {
-      SurfaceView dummy = new SurfaceView(this);
-      c.setPreviewDisplay(dummy.getHolder());
-      c.startPreview();
-      c.takePicture(null, null, jpegcb);
+      if (c != null) {
+        SurfaceView dummy = new SurfaceView(this);
+        c.setPreviewDisplay(dummy.getHolder());
+        c.startPreview();
+        c.takePicture(null, null, jpegcb);
+      }
     } catch (IOException e) {
       e.printStackTrace();
-    } catch (Exception e) {
-      //pass
     }
-    //finally {
-    //  if (c != null) {
-    //    c.release(); // todo: test if re-releasing causes issues
-    //  }
-    //}
 
-    //String doorId = "65432353";
-    String doorId = "04450031";
+    String doorId = "65432353";
+    //String doorId = "04450031";
     HttpPost post = new HttpPost("http://covrme-dev-armstrong-timothy.appspot.com/doorbells/" + doorId + "/visitors");
     MultipartEntity ent = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 
@@ -89,10 +82,9 @@ abstract public class ApproachActivity extends Activity {
     protected String doInBackground(HttpPost... reqs) {
       // silly... but w/e
       String r = "";
-      for (HttpPost post : reqs) {
-        HttpClient client = new DefaultHttpClient();
-
-        try {
+      try {
+        for (HttpPost post : reqs) {
+          HttpClient client = new DefaultHttpClient();
           HttpResponse resp = client.execute(post);
           BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent(), "UTF-8"));
           String response;
@@ -101,9 +93,11 @@ abstract public class ApproachActivity extends Activity {
             s = s.append(response);
           }
           r = s.toString();
-        } catch (IOException e) {
-          e.printStackTrace();
         }
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (Exception e) {
+        Log.d(TAG, "catch all?");
       }
       return r;
     }
@@ -115,7 +109,7 @@ abstract public class ApproachActivity extends Activity {
         int id = json.getInt("id");
         String visitorId = Integer.toString(id);
         String upload = json.getString("photo_upload_url");
-        final Util.Args arg = new Util.Args(upload, visitorId, "");
+        final Util.Args arg = new Util.Args(upload, visitorId);
         (new Handler()).postDelayed(new Runnable() {
           @Override
           public void run() {
@@ -163,7 +157,6 @@ abstract public class ApproachActivity extends Activity {
       } catch (IOException e) {
         e.printStackTrace();
       }
-      a.arbitrary = r;
       return a;
     }
 
@@ -180,7 +173,8 @@ abstract public class ApproachActivity extends Activity {
     protected String doInBackground(Util.Args... reqs) {
       Util.Args a = reqs[0];
       HttpClient client = new DefaultHttpClient();
-      String doorid = "04450031";
+      String doorid = "65432353";
+      //String doorid = "04450031";
       HttpGet get = new HttpGet("http://covrme-dev-armstrong-timothy.appspot.com/doorbells/" + doorid + "/visitors/" + a.visitorId + "/messages");
 
       String content = "No answer received.";
